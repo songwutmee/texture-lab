@@ -1,0 +1,8 @@
+{
+  "textures": [
+    { "name": "smoke_alpha",   "type": "perlin",  "scale": 3, "octaves": 6, "contrast": 1.4, "seed": 11 },
+    { "name": "fire_dissolve", "type": "warp",    "scale": 5, "octaves": 5, "warp_str": 3,   "seed": 22 },
+    { "name": "crack_mask",    "type": "voronoi", "scale": 6, "contrast": 2, "invert": true, "seed": 33 },
+    { "name": "energy_veins",  "type": "ridge",   "scale": 7, "octaves": 6, "contrast": 1.8, "seed": 44 }
+  ]
+}

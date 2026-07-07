@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Texture Lab</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%23181613'/><rect x='3' y='3' width='10' height='10' fill='%23e08a3c'/></svg>">
+</head>
+<body>
+
+<header>
+  <div class="brand">Texture<span>Lab</span></div>
+  <div class="tab active" data-page="gen">Texture Generator</div>
+  <div class="tab" data-page="shape">Shape / VFX</div>
+  <div class="tab" data-page="nm">Normal Map</div>
+  <div class="header-spacer"></div>
+  <div class="header-hint">
+    <kbd>R</kbd> random &nbsp; <kbd>Ctrl</kbd>+<kbd>Z</kbd> undo &nbsp; <kbd>1</kbd>–<kbd>9</kbd> type &nbsp; <kbd>Ctrl</kbd>+<kbd>S</kbd> save
+  </div>
+</header>
+
+<!-- ============ PAGE: GENERATOR ============ -->
+<div id="page-gen" class="page active">
+  <div class="panel-l">
+    <div class="label">Pattern</div>
+    <div id="type-list"></div>
+    <div class="label">Presets</div>
+    <div class="preset-grid" id="preset-grid"></div>
+  </div>
+
+  <div class="stage">
+    <div class="canvas-frame">
+      <canvas id="tex-canvas" width="420" height="420"></canvas>
+    </div>
+    <div class="stage-meta">
+      <span>pattern <b id="m-type">Perlin</b></span>
+      <span>render <b id="m-time">0ms</b></span>
+      <span>drag canvas to pan</span>
+    </div>
+    <div class="btn-row">
+      <button class="btn" data-action="undo" id="btn-undo" title="Ctrl+Z">↩ Undo</button>
+      <button class="btn" data-action="redo" id="btn-redo" title="Ctrl+Y">↪ Redo</button>
+      <button class="btn" data-action="randomize" title="R">⚄ Randomize</button>
+      <button class="btn" data-action="copy">⎘ Copy</button>
+      <button class="btn" data-action="paste">⎗ Paste</button>
+      <button class="btn" data-action="reset">Reset</button>
+    </div>
+  </div>
+
+  <div class="panel-r">
+    <div class="group">
+      <div class="group-title">Noise <span class="mini" data-action="seed">↻ new seed</span></div>
+      <div class="ctrl">
+        <label>Seed</label>
+        <input type="number" id="g-seed" value="42" min="0" max="9999">
+        <button class="icon-btn" data-action="seed">↻</button>
+      </div>
+      <div class="ctrl"><label title="Pattern zoom / frequency">Scale</label>
+        <input type="range" id="g-scale" min="1" max="20" step="0.1" value="4">
+        <span class="v" id="g-scale-v">4.0</span></div>
+      <div class="ctrl" data-fbm><label title="Stacked noise layers">Octaves</label>
+        <input type="range" id="g-oct" min="1" max="8" step="1" value="5">
+        <span class="v" id="g-oct-v">5</span></div>
+      <div class="ctrl" data-fbm><label title="Frequency growth per octave">Lacunarity</label>
+        <input type="range" id="g-lac" min="1" max="4" step="0.05" value="2">
+        <span class="v" id="g-lac-v">2.00</span></div>
+      <div class="ctrl" data-fbm><label title="Amplitude falloff per octave">Persistence</label>
+        <input type="range" id="g-per" min="0.1" max="1" step="0.01" value="0.5">
+        <span class="v" id="g-per-v">0.50</span></div>
+    </div>
+
+    <div class="group" id="warp-group" style="display:none">
+      <div class="group-title">Domain Warp</div>
+      <div class="ctrl"><label title="How far UVs shift before sampling">Strength</label>
+        <input type="range" id="g-ws" min="0" max="4" step="0.05" value="1.5">
+        <span class="v" id="g-ws-v">1.50</span></div>
+      <div class="ctrl"><label>Freq</label>
+        <input type="range" id="g-wf" min="0.5" max="5" step="0.1" value="1">
+        <span class="v" id="g-wf-v">1.0</span></div>
+    </div>
+
+    <div class="group">
+      <div class="group-title">Adjust</div>
+      <div class="ctrl"><label>Contrast</label>
+        <input type="range" id="g-cont" min="0.1" max="6" step="0.05" value="1">
+        <span class="v" id="g-cont-v">1.00</span></div>
+      <div class="ctrl"><label>Brightness</label>
+        <input type="range" id="g-bri" min="-1" max="1" step="0.01" value="0">
+        <span class="v" id="g-bri-v">0.00</span></div>
+      <div class="ctrl"><label title="Clip darks">Level Lo</label>
+        <input type="range" id="g-lo" min="0" max="0.99" step="0.01" value="0">
+        <span class="v" id="g-lo-v">0.00</span></div>
+      <div class="ctrl"><label title="Clip lights">Level Hi</label>
+        <input type="range" id="g-hi" min="0.01" max="1" step="0.01" value="1">
+        <span class="v" id="g-hi-v">1.00</span></div>
+      <label class="check"><input type="checkbox" id="g-inv"> Invert</label>
+      <label class="check"><input type="checkbox" id="g-seamless"> Seamless tile</label>
+    </div>
+
+    <div class="group">
+      <div class="group-title">Tiling</div>
+      <div class="ctrl"><label>Tile X</label>
+        <input type="range" id="g-tx" min="1" max="8" step="1" value="1">
+        <span class="v" id="g-tx-v">1</span></div>
+      <div class="ctrl"><label>Tile Y</label>
+        <input type="range" id="g-ty" min="1" max="8" step="1" value="1">
+        <span class="v" id="g-ty-v">1</span></div>
+    </div>
+
+    <div class="group">
+      <div class="group-title">PBR Maps <span class="mini" data-action="pbr-all">↓ download all</span></div>
+      <div class="pbr-grid" id="pbr-grid"></div>
+      <div style="font-size:10px;color:var(--ink-faint);padding:4px 0 0;text-align:center">click a map to download</div>
+    </div>
+
+    <div class="group">
+      <div class="group-title">Export PNG</div>
+      <div class="btn-row" style="justify-content:flex-start">
+        <button class="btn" data-action="export" data-size="256" title="256² RGBA ≈ 0.25 MB VRAM">256</button>
+        <button class="btn" data-action="export" data-size="512" title="512² RGBA ≈ 1 MB VRAM">512</button>
+        <button class="btn" data-action="export" data-size="1024" title="1024² RGBA ≈ 4 MB VRAM">1024</button>
+        <button class="btn primary" data-action="export" data-size="2048" title="2048² RGBA ≈ 16 MB VRAM">2048</button>
+      </div>
+      <div class="ctrl" style="margin-top:8px">
+        <label>Channel</label>
+        <select id="g-out">
+          <option value="0">Grayscale</option>
+          <option value="1">R only</option>
+          <option value="2">G only</option>
+          <option value="3">B only</option>
+          <option value="4">RGBA packed</option>
+        </select>
+      </div>
+      <button class="btn" style="width:100%;justify-content:center;margin-top:6px" data-action="hlsl">⎘ Copy HLSL snippet</button>
+    </div>
+
+    <div class="hint" id="g-hint"></div>
+  </div>
+</div>
+
+<!-- ============ PAGE: SHAPE / VFX ============ -->
+<div id="page-shape" class="page">
+  <div class="panel-l">
+    <div class="label">Shape</div>
+    <div id="shape-list"></div>
+    <div class="label">VFX Presets</div>
+    <div class="preset-grid" id="shape-preset-grid"></div>
+  </div>
+
+  <div class="stage">
+    <div class="canvas-frame">
+      <canvas id="shape-canvas" width="420" height="420"></canvas>
+    </div>
+    <div class="stage-meta">
+      <span>shape <b id="s-name">Ring</b></span>
+      <span>render <b id="s-ms">0ms</b></span>
+    </div>
+    <div class="btn-row">
+      <button class="btn" data-action="shape-reset">Reset</button>
+    </div>
+  </div>
+
+  <div class="panel-r">
+    <div class="group">
+      <div class="group-title">Shape</div>
+      <div class="ctrl"><label>Radius</label>
+        <input type="range" id="s-p1" min="0.05" max="0.9" step="0.01" value="0.4">
+        <span class="v" id="s-p1-v">0.40</span></div>
+      <div class="ctrl"><label>Thickness</label>
+        <input type="range" id="s-p2" min="0.01" max="0.5" step="0.01" value="0.15">
+        <span class="v" id="s-p2-v">0.15</span></div>
+      <div class="ctrl"><label>Softness</label>
+        <input type="range" id="s-p3" min="0.005" max="0.4" step="0.005" value="0.06">
+        <span class="v" id="s-p3-v">0.060</span></div>
+      <div class="ctrl" style="display:none"><label>P4</label>
+        <input type="range" id="s-p4" min="0" max="1" step="0.01" value="0">
+        <span class="v" id="s-p4-v">0.00</span></div>
+      <div class="ctrl"><label>Rotation</label>
+        <input type="range" id="s-rot" min="0" max="360" step="1" value="0">
+        <span class="v" id="s-rot-v">0</span></div>
+      <div class="ctrl"><label title="Additive soft center, for flashes">Core Glow</label>
+        <input type="range" id="s-glow" min="0" max="1" step="0.01" value="0">
+        <span class="v" id="s-glow-v">0.00</span></div>
+    </div>
+
+    <div class="group">
+      <div class="group-title">Noise Blend</div>
+      <div class="ctrl"><label>Pattern</label>
+        <select id="s-ntype">
+          <option value="0">Perlin FBM</option>
+          <option value="1">Ridge</option>
+          <option value="2">Voronoi</option>
+          <option value="3">Curl</option>
+          <option value="4">White</option>
+        </select></div>
+      <div class="ctrl"><label>Blend</label>
+        <select id="s-blend">
+          <option value="0">Multiply</option>
+          <option value="1">Add</option>
+          <option value="2">Screen</option>
+          <option value="3">Overlay</option>
+        </select></div>
+      <div class="ctrl"><label>Amount</label>
+        <input type="range" id="s-nmix" min="0" max="1" step="0.01" value="0">
+        <span class="v" id="s-nmix-v">0.00</span></div>
+      <div class="ctrl"><label>Scale</label>
+        <input type="range" id="s-nscale" min="1" max="10" step="0.1" value="4">
+        <span class="v" id="s-nscale-v">4.0</span></div>
+      <div class="ctrl"><label>Octaves</label>
+        <input type="range" id="s-noct" min="1" max="8" step="1" value="4">
+        <span class="v" id="s-noct-v">4</span></div>
+      <div class="ctrl"><label title="Noise pushes the outline for organic edges">Distort</label>
+        <input type="range" id="s-ndist" min="0" max="1" step="0.01" value="0">
+        <span class="v" id="s-ndist-v">0.00</span></div>
+      <label class="check"><input type="checkbox" id="s-npolar"> Polar warp (radial pattern)</label>
+      <div class="ctrl">
+        <label>Seed</label>
+        <input type="number" id="s-seed" value="7" min="0" max="9999">
+      </div>
+    </div>
+
+    <div class="group">
+      <div class="group-title">Adjust</div>
+      <div class="ctrl"><label>Contrast</label>
+        <input type="range" id="s-cont" min="0.1" max="6" step="0.05" value="1">
+        <span class="v" id="s-cont-v">1.00</span></div>
+      <div class="ctrl"><label>Brightness</label>
+        <input type="range" id="s-bri" min="-1" max="1" step="0.01" value="0">
+        <span class="v" id="s-bri-v">0.00</span></div>
+      <label class="check"><input type="checkbox" id="s-inv"> Invert</label>
+    </div>
+
+    <div class="group">
+      <div class="group-title">Export PNG</div>
+      <div class="btn-row" style="justify-content:flex-start">
+        <button class="btn" data-action="export" data-size="256" title="256² RGBA ≈ 0.25 MB VRAM">256</button>
+        <button class="btn primary" data-action="export" data-size="512" title="512² RGBA ≈ 1 MB VRAM">512</button>
+        <button class="btn" data-action="export" data-size="1024" title="1024² RGBA ≈ 4 MB VRAM">1024</button>
+      </div>
+      <div class="ctrl" style="margin-top:8px">
+        <label>Channel</label>
+        <select id="s-out">
+          <option value="1">White + Alpha</option>
+          <option value="0">Grayscale</option>
+          <option value="2">Gray + Alpha</option>
+        </select>
+      </div>
+      <div style="font-size:10px;color:var(--ink-faint);padding:4px 0 0">
+        White + Alpha drops straight into a particle system.
+      </div>
+    </div>
+
+    <div class="hint" id="s-hint"></div>
+  </div>
+</div>
+
+<!-- ============ PAGE: NORMAL MAP ============ -->
+<div id="page-nm" class="page">
+  <div class="panel-l">
+    <div class="label">Source</div>
+    <div class="drop" id="drop">
+      <span class="big">↓</span>
+      Drag image here<br>or click to open<br>
+      <span style="font-size:10px;color:var(--ink-faint)">PNG / JPG</span>
+    </div>
+    <input type="file" id="nm-file" accept="image/*" style="display:none">
+    <button class="btn" style="margin:0 10px;justify-content:center" data-action="use-gen">↤ Import from Texture Generator</button>
+
+    <div class="hint" style="border-top:none;margin-top:8px">
+      <b>Tip</b><br>
+      No image handy? The button above copies whatever the Texture Generator tab is currently showing and uses it as the heightmap here.
+    </div>
+  </div>
+
+  <div class="nm-stage">
+    <div class="nm-previews">
+      <div class="nm-slot">
+        <div class="nm-slot-head">Height <span class="dl" data-action="download" data-map="src">↓</span></div>
+        <div class="nm-view" id="nm-src"><p class="nm-empty">drop an image</p></div>
+      </div>
+      <div class="nm-slot">
+        <div class="nm-slot-head">Normal <span class="dl" data-action="download" data-map="nrm">↓</span></div>
+        <div class="nm-view" id="nm-nrm"><p class="nm-empty">normal output</p></div>
+      </div>
+      <div class="nm-slot">
+        <div class="nm-slot-head">Displace <span class="dl" data-action="download" data-map="dsp">↓</span></div>
+        <div class="nm-view" id="nm-dsp"><p class="nm-empty">displacement</p></div>
+      </div>
+      <div class="nm-slot">
+        <div class="nm-slot-head">AO <span class="dl" data-action="download" data-map="ao">↓</span></div>
+        <div class="nm-view" id="nm-ao"><p class="nm-empty">ambient occlusion</p></div>
+      </div>
+    </div>
+    <div class="nm-bar">
+      <span class="nm-info" id="nm-info">no image loaded</span>
+      <button class="btn" data-action="download-all">↓ All maps</button>
+      <button class="btn primary" data-action="download" data-map="nrm">↓ Normal Map</button>
+    </div>
+  </div>
+
+  <div class="panel-r">
+    <div class="group">
+      <div class="group-title">Normal <span class="mini" data-action="nm-reset">reset</span></div>
+      <div class="ctrl"><label title="Bump intensity">Strength</label>
+        <input type="range" id="nm-str" min="0.5" max="20" step="0.1" value="4">
+        <span class="v" id="nm-str-v">4.0</span></div>
+      <div class="ctrl"><label title="Sample distance for detail size">Detail</label>
+        <input type="range" id="nm-lvl" min="1" max="8" step="1" value="1">
+        <span class="v" id="nm-lvl-v">1</span></div>
+      <div class="ctrl"><label title="Negative blurs, positive sharpens">Smooth</label>
+        <input type="range" id="nm-blur" min="-3" max="3" step="0.1" value="0">
+        <span class="v" id="nm-blur-v">0.0</span></div>
+      <div class="ctrl"><label>Filter</label>
+        <select id="nm-filter">
+          <option value="sobel">Sobel</option>
+          <option value="scharr">Scharr</option>
+        </select></div>
+      <div class="ctrl"><label title="Surface flatness, higher = flatter">Z Depth</label>
+        <input type="range" id="nm-z" min="0.1" max="4" step="0.05" value="1">
+        <span class="v" id="nm-z-v">1.00</span></div>
+    </div>
+
+    <div class="group">
+      <div class="group-title">Format</div>
+      <label class="check"><input type="checkbox" id="nm-ig"> Invert G (DirectX)</label>
+      <label class="check"><input type="checkbox" id="nm-ir"> Invert R</label>
+      <label class="check"><input type="checkbox" id="nm-ih"> Invert height</label>
+      <div style="font-size:10px;color:var(--ink-faint);line-height:1.6;margin-top:4px">
+        Unity uses OpenGL normals (G up). Unreal uses DirectX (G down). Toggle <b style="color:var(--ink-dim)">Invert G</b> to switch.
+      </div>
+    </div>
+
+    <div class="group">
+      <div class="group-title">AO &amp; Displace</div>
+      <div class="ctrl"><label title="Ambient occlusion strength">AO Power</label>
+        <input type="range" id="nm-aop" min="0" max="3" step="0.05" value="1">
+        <span class="v" id="nm-aop-v">1.00</span></div>
+      <div class="ctrl"><label title="Displacement contrast">Disp Contr</label>
+        <input type="range" id="nm-dc" min="0.1" max="3" step="0.05" value="1">
+        <span class="v" id="nm-dc-v">1.00</span></div>
+    </div>
+
+    <div class="hint">
+      <b>Workflow</b><br>
+      1. Drop a grayscale heightmap<br>
+      2. Tune Strength + Detail<br>
+      3. Set Invert G for your engine<br>
+      4. Download Normal, or grab all maps at once
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script type="module" src="/src/main.ts"></script>
+</body>
+</html>

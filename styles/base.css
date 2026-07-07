@@ -1,0 +1,27 @@
+:root {
+  --bg: #181613;
+  --panel: #211e1a;
+  --panel2: #2a2620;
+  --line: #38322a;
+  --line2: #4a4337;
+  --ink: #e8e2d6;
+  --ink-dim: #a39b8b;
+  --ink-faint: #6e665a;
+  --accent: #e08a3c;
+  --accent-soft: #2e2419;
+  --cream: #f0ead8;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font: 13px/1.4 'Segoe UI', system-ui, sans-serif;
+  height: 100vh;
+  overflow: hidden;
+}
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-thumb { background: var(--line2); border-radius: 3px; }
+::-webkit-scrollbar-track { background: transparent; }

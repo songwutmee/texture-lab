@@ -1,0 +1,5 @@
+Pillow>=10.0
+click>=8.0
+numpy>=1.26
+watchdog>=3.0
+rich>=13.0
