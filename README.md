@@ -2,7 +2,7 @@
 
 # Texture Lab
 
-*A browser-based procedural texture authoring tool. Real-time GPU generation, built from scratch with TypeScript and raw WebGL, no engine and no framework.*
+*A browser-based procedural texture authoring tool. Real-time GPU generation, built from scratch with TypeScript and raw WebGL.*
 
 [![Texture Lab](docs/showcase.gif)](https://songwutmee.github.io/texture-lab/)
 
