@@ -1,7 +1,8 @@
 import { getGL, createProgram, drawNoise, glToCanvas, NOISE_FRAG, GL, Program, Settings, Pan } from '../engine/WebGLEngine';
 import { derive, PBRMap, PBR_MAPS } from '../engine/PBRDeriver';
 import { History } from '../history';
-import { downloadCanvas } from '../export';
+import { downloadCanvas, downloadBlob, canvasToPNGBytes } from '../export';
+import { makeZip } from '../zip';
 import { $, gf, gc, setVal } from '../ui/controls';
 import { toast } from '../ui/toast';
 
@@ -300,10 +301,19 @@ function downloadPBRMap(name: PBRMap, size: number) {
   downloadCanvas(cv, `${name.toLowerCase()}_${size}.png`);
 }
 
-function exportPBRZip() {
-  // no zip lib: fire the downloads spaced out so the browser accepts them all
-  PBR_MAPS.forEach((name, i) => setTimeout(() => downloadPBRMap(name, 512), i * 250));
-  toast('Downloading 5 PBR maps');
+async function exportPBRZip() {
+  const size = 512;
+  toast('Zipping PBR maps…');
+  const entries = await Promise.all(PBR_MAPS.map(async name => {
+    const h = renderHeight(size);
+    const cv = document.createElement('canvas');
+    cv.width = cv.height = size;
+    cv.getContext('2d')!.putImageData(new ImageData(derive(name, h, size), size, size), 0, 0);
+    const data = await canvasToPNGBytes(cv);
+    return { name: `${curType}_${name.toLowerCase()}_${size}.png`, data };
+  }));
+  downloadBlob(makeZip(entries), `${curType}_pbr_maps.zip`);
+  toast('Downloaded PBR maps.zip');
 }
 
 // ---- PNG + HLSL export ----
