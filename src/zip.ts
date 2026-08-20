@@ -11,7 +11,7 @@ const CRC_TABLE = (() => {
   return table;
 })();
 
-function crc32(data: Uint8Array): number {
+function crc32(data: Uint8Array<ArrayBuffer>): number {
   let crc = 0xffffffff;
   for (let i = 0; i < data.length; i++) crc = CRC_TABLE[(crc ^ data[i]) & 0xff] ^ (crc >>> 8);
   return (crc ^ 0xffffffff) >>> 0;
@@ -24,12 +24,12 @@ function dosDateTime(): { date: number; time: number } {
   return { date, time };
 }
 
-export interface ZipEntry { name: string; data: Uint8Array; }
+export interface ZipEntry { name: string; data: Uint8Array<ArrayBuffer>; }
 
 export function makeZip(entries: ZipEntry[]): Blob {
   const { date, time } = dosDateTime();
-  const chunks: Uint8Array[] = [];
-  const central: Uint8Array[] = [];
+  const chunks: Uint8Array<ArrayBuffer>[] = [];
+  const central: Uint8Array<ArrayBuffer>[] = [];
   let offset = 0;
 
   for (const { name, data } of entries) {
@@ -49,7 +49,7 @@ export function makeZip(entries: ZipEntry[]): Blob {
     local.setUint16(26, nameBytes.length, true);
     local.setUint16(28, 0, true);          // extra field length
 
-    chunks.push(new Uint8Array(local.buffer), nameBytes, data);
+    chunks.push(new Uint8Array<ArrayBuffer>(local.buffer), nameBytes, data);
 
     const centralHeader = new DataView(new ArrayBuffer(46));
     centralHeader.setUint32(0, 0x02014b50, true);
@@ -70,7 +70,7 @@ export function makeZip(entries: ZipEntry[]): Blob {
     centralHeader.setUint32(38, 0, true);   // external attrs
     centralHeader.setUint32(42, offset, true);
 
-    central.push(new Uint8Array(centralHeader.buffer), nameBytes);
+    central.push(new Uint8Array<ArrayBuffer>(centralHeader.buffer), nameBytes);
     offset += 30 + nameBytes.length + data.length;
   }
 
@@ -88,5 +88,6 @@ export function makeZip(entries: ZipEntry[]): Blob {
   eocd.setUint32(16, centralStart, true);
   eocd.setUint16(20, 0, true);
 
-  return new Blob([...chunks, ...central, new Uint8Array(eocd.buffer)], { type: 'application/zip' });
+  const parts: BlobPart[] = [...chunks, ...central, new Uint8Array<ArrayBuffer>(eocd.buffer)];
+  return new Blob(parts, { type: 'application/zip' });
 }

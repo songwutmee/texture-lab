@@ -15,7 +15,7 @@ export function downloadBlob(blob: Blob, filename: string) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-export function canvasToPNGBytes(cv: HTMLCanvasElement): Promise<Uint8Array> {
+export function canvasToPNGBytes(cv: HTMLCanvasElement): Promise<Uint8Array<ArrayBuffer>> {
   return new Promise((resolve, reject) => {
     cv.toBlob(blob => {
       if (!blob) { reject(new Error('toBlob failed')); return; }
