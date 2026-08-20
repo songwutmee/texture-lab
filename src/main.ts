@@ -2,11 +2,9 @@ import '../styles/base.css';
 import '../styles/layout.css';
 import '../styles/controls.css';
 import { initTextureGen, getGenState, applyGenState } from './tabs/TextureGen';
-import { initShapeVFX, getShapeState, applyShapeState } from './tabs/ShapeVFX';
 import { initNormalMap } from './tabs/NormalMap';
 
 const gen = initTextureGen();
-initShapeVFX();
 initNormalMap(switchTab);
 restoreFromHash();
 
@@ -30,7 +28,7 @@ function scheduleHashUpdate() {
   clearTimeout(hashTimer);
   hashTimer = window.setTimeout(() => {
     const tab = (document.querySelector('.tab.active') as HTMLElement).dataset.page;
-    const state = { tab, gen: getGenState(), shape: getShapeState() };
+    const state = { tab, gen: getGenState() };
     window.history.replaceState(null, '', '#' + btoa(JSON.stringify(state)));
   }, 500);
 }
@@ -40,7 +38,6 @@ function restoreFromHash() {
   try {
     const state = JSON.parse(atob(location.hash.slice(1)));
     if (state.gen) applyGenState(state.gen);
-    if (state.shape) applyShapeState(state.shape);
     if (state.tab && state.tab !== 'gen') switchTab(state.tab);
   } catch {
     // stale or hand-edited hash, start fresh
@@ -49,7 +46,7 @@ function restoreFromHash() {
 
 ['input', 'change'].forEach(ev =>
   document.addEventListener(ev, e => {
-    if ((e.target as HTMLElement).closest('#page-gen, #page-shape')) scheduleHashUpdate();
+    if ((e.target as HTMLElement).closest('#page-gen')) scheduleHashUpdate();
   }),
 );
 

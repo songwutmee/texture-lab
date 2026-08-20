@@ -1,10 +1,8 @@
 import common from '../shaders/common.glsl?raw';
 import noiseBody from '../shaders/noise.glsl?raw';
-import shapeBody from '../shaders/shape.glsl?raw';
 
 // shaders share the math library in common.glsl, spliced in at build time
 export const NOISE_FRAG = common + noiseBody;
-export const SHAPE_FRAG = common + shapeBody;
 
 export type GL = WebGLRenderingContext;
 
