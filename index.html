@@ -4,15 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Texture Lab</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%23181613'/><rect x='3' y='3' width='10' height='10' fill='%23e08a3c'/></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%23f4f1ea'/><rect x='2' y='2' width='12' height='12' fill='none' stroke='%23141414' stroke-width='2'/><rect x='6' y='6' width='4' height='4' fill='%23141414'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
+<div class="crt"></div>
+
 <header>
-  <div class="brand">Texture<span>Lab</span></div>
-  <div class="tab active" data-page="gen">Texture Generator</div>
-  <div class="tab" data-page="shape">Shape / VFX</div>
-  <div class="tab" data-page="nm">Normal Map</div>
+  <nav class="tabs">
+    <button class="tab active" data-page="gen">Texture Generator</button>
+    <button class="tab" data-page="nm">Normal Map</button>
+  </nav>
   <div class="header-spacer"></div>
   <div class="header-hint">
     <kbd>R</kbd> random &nbsp; <kbd>Ctrl</kbd>+<kbd>Z</kbd> undo &nbsp; <kbd>1</kbd>–<kbd>9</kbd> type &nbsp; <kbd>Ctrl</kbd>+<kbd>S</kbd> save
@@ -135,122 +139,6 @@
     </div>
 
     <div class="hint" id="g-hint"></div>
-  </div>
-</div>
-
-<!-- ============ PAGE: SHAPE / VFX ============ -->
-<div id="page-shape" class="page">
-  <div class="panel-l">
-    <div class="label">Shape</div>
-    <div id="shape-list"></div>
-    <div class="label">VFX Presets</div>
-    <div class="preset-grid" id="shape-preset-grid"></div>
-  </div>
-
-  <div class="stage">
-    <div class="canvas-frame">
-      <canvas id="shape-canvas" width="420" height="420"></canvas>
-    </div>
-    <div class="stage-meta">
-      <span>shape <b id="s-name">Ring</b></span>
-      <span>render <b id="s-ms">0ms</b></span>
-    </div>
-    <div class="btn-row">
-      <button class="btn" data-action="shape-reset">Reset</button>
-    </div>
-  </div>
-
-  <div class="panel-r">
-    <div class="group">
-      <div class="group-title">Shape</div>
-      <div class="ctrl"><label>Radius</label>
-        <input type="range" id="s-p1" min="0.05" max="0.9" step="0.01" value="0.4">
-        <span class="v" id="s-p1-v">0.40</span></div>
-      <div class="ctrl"><label>Thickness</label>
-        <input type="range" id="s-p2" min="0.01" max="0.5" step="0.01" value="0.15">
-        <span class="v" id="s-p2-v">0.15</span></div>
-      <div class="ctrl"><label>Softness</label>
-        <input type="range" id="s-p3" min="0.005" max="0.4" step="0.005" value="0.06">
-        <span class="v" id="s-p3-v">0.060</span></div>
-      <div class="ctrl" style="display:none"><label>P4</label>
-        <input type="range" id="s-p4" min="0" max="1" step="0.01" value="0">
-        <span class="v" id="s-p4-v">0.00</span></div>
-      <div class="ctrl"><label>Rotation</label>
-        <input type="range" id="s-rot" min="0" max="360" step="1" value="0">
-        <span class="v" id="s-rot-v">0</span></div>
-      <div class="ctrl"><label title="Additive soft center, for flashes">Core Glow</label>
-        <input type="range" id="s-glow" min="0" max="1" step="0.01" value="0">
-        <span class="v" id="s-glow-v">0.00</span></div>
-    </div>
-
-    <div class="group">
-      <div class="group-title">Noise Blend</div>
-      <div class="ctrl"><label>Pattern</label>
-        <select id="s-ntype">
-          <option value="0">Perlin FBM</option>
-          <option value="1">Ridge</option>
-          <option value="2">Voronoi</option>
-          <option value="3">Curl</option>
-          <option value="4">White</option>
-        </select></div>
-      <div class="ctrl"><label>Blend</label>
-        <select id="s-blend">
-          <option value="0">Multiply</option>
-          <option value="1">Add</option>
-          <option value="2">Screen</option>
-          <option value="3">Overlay</option>
-        </select></div>
-      <div class="ctrl"><label>Amount</label>
-        <input type="range" id="s-nmix" min="0" max="1" step="0.01" value="0">
-        <span class="v" id="s-nmix-v">0.00</span></div>
-      <div class="ctrl"><label>Scale</label>
-        <input type="range" id="s-nscale" min="1" max="10" step="0.1" value="4">
-        <span class="v" id="s-nscale-v">4.0</span></div>
-      <div class="ctrl"><label>Octaves</label>
-        <input type="range" id="s-noct" min="1" max="8" step="1" value="4">
-        <span class="v" id="s-noct-v">4</span></div>
-      <div class="ctrl"><label title="Noise pushes the outline for organic edges">Distort</label>
-        <input type="range" id="s-ndist" min="0" max="1" step="0.01" value="0">
-        <span class="v" id="s-ndist-v">0.00</span></div>
-      <label class="check"><input type="checkbox" id="s-npolar"> Polar warp (radial pattern)</label>
-      <div class="ctrl">
-        <label>Seed</label>
-        <input type="number" id="s-seed" value="7" min="0" max="9999">
-      </div>
-    </div>
-
-    <div class="group">
-      <div class="group-title">Adjust</div>
-      <div class="ctrl"><label>Contrast</label>
-        <input type="range" id="s-cont" min="0.1" max="6" step="0.05" value="1">
-        <span class="v" id="s-cont-v">1.00</span></div>
-      <div class="ctrl"><label>Brightness</label>
-        <input type="range" id="s-bri" min="-1" max="1" step="0.01" value="0">
-        <span class="v" id="s-bri-v">0.00</span></div>
-      <label class="check"><input type="checkbox" id="s-inv"> Invert</label>
-    </div>
-
-    <div class="group">
-      <div class="group-title">Export PNG</div>
-      <div class="btn-row" style="justify-content:flex-start">
-        <button class="btn" data-action="export" data-size="256" title="256² RGBA ≈ 0.25 MB VRAM">256</button>
-        <button class="btn primary" data-action="export" data-size="512" title="512² RGBA ≈ 1 MB VRAM">512</button>
-        <button class="btn" data-action="export" data-size="1024" title="1024² RGBA ≈ 4 MB VRAM">1024</button>
-      </div>
-      <div class="ctrl" style="margin-top:8px">
-        <label>Channel</label>
-        <select id="s-out">
-          <option value="1">White + Alpha</option>
-          <option value="0">Grayscale</option>
-          <option value="2">Gray + Alpha</option>
-        </select>
-      </div>
-      <div style="font-size:10px;color:var(--ink-faint);padding:4px 0 0">
-        White + Alpha drops straight into a particle system.
-      </div>
-    </div>
-
-    <div class="hint" id="s-hint"></div>
   </div>
 </div>
 
