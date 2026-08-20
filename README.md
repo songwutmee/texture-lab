@@ -2,7 +2,7 @@
 
 # Texture Lab
 
-*A browser-based procedural texture and VFX authoring tool. Real-time GPU generation, built from scratch with TypeScript and raw WebGL, no engine and no framework.*
+*A browser-based procedural texture authoring tool. Real-time GPU generation, built from scratch with TypeScript and raw WebGL, no engine and no framework.*
 
 [![Texture Lab](docs/showcase.gif)](https://songwutmee.github.io/texture-lab/)
 
@@ -22,7 +22,7 @@
   <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" />
 </p>
 
-Every texture is generated live on the GPU, so dragging a slider updates the preview with no lag. It is aimed at game VFX work: build noise patterns, stamp out shapes like shockwaves, slashes and lightning without opening Photoshop, and turn any heightmap into a normal map. The same generation logic ships as a small Python CLI for batch jobs.
+Every texture is generated live on the GPU, so dragging a slider updates the preview with no lag. It is aimed at game art work: build noise patterns for smoke, dissolve masks and terrain without opening Photoshop, and turn any heightmap into a full PBR set. The same generation logic ships as a small Python CLI for batch jobs.
 
 ***
 
@@ -30,9 +30,7 @@ Every texture is generated live on the GPU, so dragging a slider updates the pre
 
 I wrote the whole thing on raw WebGL to keep full control of the render loop and stay fast while sliders move.
 
-* **GPU-driven generation.** Every noise pattern and VFX shape is a GLSL fragment shader. Because the GPU shades all pixels in parallel, the preview stays interactive while a slider moves and exports scale to 2048px with no code change. Shared math (simplex, FBM, Voronoi, curl) lives in a single `common.glsl` that gets spliced into each shader at build time.
-
-* **Parametric VFX shapes.** I wrote distance-field style functions for ring, spiral, arc/slash, rays, lightning and a hex grid, each driven entirely by uniforms so every parameter maps to a live slider. Exports use straight (non-premultiplied) alpha, so a shape drops into a Unity or Unreal particle system as-is.
+* **GPU-driven generation.** Every noise pattern is a GLSL fragment shader. Because the GPU shades all pixels in parallel, the preview stays interactive while a slider moves and exports scale to 2048px with no code change. Shared math (simplex, FBM, Voronoi, curl) lives in a single `common.glsl` that gets spliced into each shader at build time.
 
 * **Seamless polar patterns.** To wrap a noise pattern around a circular shape without the usual seam at the angle wrap, I sample the noise along a reconstructed unit circle from the pixel's angle instead of the raw UV, so the pattern meets itself cleanly and no cut shows.
 
@@ -48,8 +46,7 @@ I wrote the whole thing on raw WebGL to keep full control of the render loop and
 
 | Tab | What it does |
 |-----|--------------|
-| **Texture Generator** | 10 GPU noise patterns, 12 presets, seamless tiling, PBR map set, HLSL snippet export |
-| **Shape / VFX** | 10 parametric shapes, noise blend with polar warp, 12 one-click presets, White+Alpha export |
+| **Texture Generator** | 10 GPU noise patterns, 12 presets, seamless tiling, PBR map set (zip export), HLSL snippet export |
 | **Normal Map** | Drag a heightmap or pull it from the generator, tune Sobel/Scharr, export normal / displacement / AO |
 
 ### Run locally
