@@ -362,8 +362,8 @@ function updateHistButtons() {
 }
 
 const ACTIONS: Record<string, (btn: HTMLElement) => void> = {
-  undo: () => history.undo(),
-  redo: () => history.redo(),
+  undo,
+  redo,
   randomize: () => randomizeAll(),
   copy: () => copySettings(),
   paste: () => pasteSettings(),
@@ -380,6 +380,15 @@ function scheduleHistory() {
   clearTimeout(commitTimer);
   commitTimer = window.setTimeout(() => history.push(), 400);
 }
+
+// undo/redo must not wait on the debounce, or a quick drag-then-Ctrl+Z looks like a no-op
+function flushHistory() {
+  clearTimeout(commitTimer);
+  history.push();
+}
+
+function undo() { flushHistory(); history.undo(); }
+function redo() { flushHistory(); history.redo(); }
 
 function wireEvents() {
   const page = $('page-gen');
@@ -428,8 +437,8 @@ export function initTextureGen(): GenHandlers {
   updateHistButtons();
 
   return {
-    undo: () => history.undo(),
-    redo: () => history.redo(),
+    undo,
+    redo,
     copy: copySettings,
     randomize: randomizeAll,
     exportPNG: exportTex,
