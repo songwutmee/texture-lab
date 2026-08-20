@@ -97,7 +97,6 @@ header {
     repeating-conic-gradient(#ece7db 0% 25%, #e2dccb 0% 50%) 0 0 / 12px 12px;
   border: 2px solid var(--line);
   border-radius: 4px;
-  box-shadow: 5px 5px 0 var(--line);
 }
 #tex-canvas { display: block; image-rendering: pixelated; cursor: grab; }
 #tex-canvas:active { cursor: grabbing; }
