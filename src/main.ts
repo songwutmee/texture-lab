@@ -50,23 +50,15 @@ function restoreFromHash() {
   }),
 );
 
-// ---- keyboard shortcuts (generator tab) ----
-const genActive = () => document.getElementById('page-gen')!.classList.contains('active');
-
+// ---- keyboard shortcut: Ctrl+Z undo (generator tab) ----
+// e.code is the physical key position, so this works no matter what
+// keyboard layout or input language is active (Thai, etc).
 document.addEventListener('keydown', e => {
   const el = e.target as HTMLElement;
   if (el.tagName === 'INPUT' && (el as HTMLInputElement).type === 'number') return;
 
-  if (e.ctrlKey || e.metaKey) {
-    if (e.key === 'z') { e.preventDefault(); gen.undo(); }
-    else if (e.key === 'y') { e.preventDefault(); gen.redo(); }
-    else if (e.key === 's') { e.preventDefault(); if (genActive()) gen.exportPNG(1024); }
-    else if (e.key === 'c' && genActive() && (window.getSelection()?.toString() ?? '') === '') gen.copy();
-    return;
+  if ((e.ctrlKey || e.metaKey) && e.code === 'KeyZ') {
+    e.preventDefault();
+    gen.undo();
   }
-
-  if (!genActive()) return;
-  if (e.key === 'r' || e.key === 'R') gen.randomize();
-  else if (e.key >= '1' && e.key <= '9') gen.selectByIndex(+e.key - 1);
-  else if (e.key === '0') gen.selectByIndex(9);
 });
